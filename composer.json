@@ -1,0 +1,19 @@
+{
+    "name": "develhoper/primal",
+    "description": "free and open source php templating system",
+    "type": "library",
+    "license": "GPL-3.0-only",
+    "authors": [
+        {
+            "name": "develhopper",
+            "email": "alireza.tjd77@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload":{
+        "psr-0":{
+            "Primal":"src/"
+        }
+    }
+}
