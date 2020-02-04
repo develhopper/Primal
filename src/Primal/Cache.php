@@ -21,7 +21,7 @@ class Cache{
                 self::crawl($item);
             }else{
                 self::save($item,$itemname);
-                echo hash("sha1",$itemname).".php\n";
+                echo $item."\n";
             }
         }
     }
