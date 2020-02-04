@@ -5,7 +5,7 @@ class Primal{
     public static function view($name,$args=[]){
         //TODO: Loading from cache if available
         // - adding syntax highlight for pml files to vscode
-        $filename=TPATH.$name.".html";
+        $filename=TPATH.DIRECTORY_SEPARATOR.$name.".html";
         $str=self::read($filename);
         eval("?>".self::attach($str,$args));
     }

@@ -2,13 +2,34 @@
 namespace Primal;
 
 class Cache{
-    public static function all(){
-        //TODO: make cache from all files in directory
-        // save cached files by hash code
-        $test=TPATH."test.html";
-        $dst=CTPATH."/test.php";
-        $str=self::read($test);
-        self::write($dst,self::replace($str));
+    public static function make(){
+        self::crawl(TPATH);
+    }
+
+    private static function crawl($path){
+        $list=scandir($path);
+        $list=array_diff($list,['.','..']);
+
+        $pattern="/(?<=".str_replace("/","\\/",TPATH).").*/";
+        preg_match($pattern,$path,$basename);
+        
+        foreach($list as $item){
+            $itemname=ltrim("$basename[0]/$item",'/');
+            $item="$path/$item";
+            
+            if(is_dir($item)){
+                self::crawl($item);
+            }else{
+                self::save($item,$itemname);
+                echo hash("sha1",$itemname).".php\n";
+            }
+        }
+    }
+
+    private static function save($path,$name){
+        $dst=CTPATH.DIRECTORY_SEPARATOR.hash("sha1",$name).".php";
+        $str=self::replace(self::read($path));
+        self::write($dst,$str);
     }
 
     private static function read($path){
