@@ -4,8 +4,9 @@ namespace Primal;
 class Primal{
 
     public static function view($name,$args=[]){
-        //TODO: check requested view checksum and if file has been changed so refresh cache
-        $name=hash("sha1",str_replace(".","/",$name).".html").".php";
+        $name=str_replace(".","/",$name).".html";
+        Cache::checkview($name);
+        $name=hash("sha1",$name).".php";
         $path=CTPATH.DIRECTORY_SEPARATOR.$name;
         if(!file_exists($path)){
             die("View Not Exists");
@@ -22,10 +23,7 @@ class Primal{
     } 
 
     private static function read($path){
-        $f=fopen($path,"r") or die("$path not found");
-        $r=fread($f,filesize($path));
-        fclose($f);
-        return $r;
+        return file_get_contents($path);
     }
     private static function attach($str,$args=[]){
         foreach($args as $key=>$value)

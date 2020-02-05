@@ -4,14 +4,26 @@ namespace Primal;
 class Cache{
     private static $allfiles=[];
     private static $md5list=CTPATH.DIRECTORY_SEPARATOR."cache.json";
+    
     public static function make(){
         self::$allfiles=json_decode(file_get_contents(self::$md5list),true);
         
         self::crawl(TPATH);
-        file_put_contents(self::$md5list,
-        json_encode(self::$allfiles,JSON_PRETTY_PRINT));
+        self::updatemd5list();
     }
 
+    public static function checkview($name){
+        $path=TPATH.DIRECTORY_SEPARATOR.$name;
+        self::$allfiles=json_decode(file_get_contents(self::$md5list),true);
+        if(!self::check_checksum($path,$name)){
+            self::save($path,$name);
+            self::updatemd5list();
+        }
+    }
+    private static function updatemd5list(){
+        file_put_contents(self::$md5list,
+        json_encode(self::$allfiles,JSON_PRETTY_PRINT));
+    } 
     private static function crawl($path){
         $list=scandir($path);
         $list=array_diff($list,['.','..']);
@@ -29,7 +41,6 @@ class Cache{
                 if(!self::check_checksum($item,$itemname)){
                     echo "$item \n";
                     self::save($item,$itemname);
-                    self::checksum($item,$itemname);
                 }
             }
         }
@@ -38,7 +49,9 @@ class Cache{
     private static function save($path,$name){
         $dst=CTPATH.DIRECTORY_SEPARATOR.hash("sha1",$name).".php";
         $str=self::replace(self::read($path));
+        var_dump($dst);
         self::write($dst,$str);
+        self::checksum($path,$name);
     }
 
     private static function checksum($path,$name){
@@ -47,8 +60,10 @@ class Cache{
     }
 
     private static function check_checksum($path,$name){
-        $sum=md5_file($path);
-        return self::$allfiles[$name]==$sum;
+        if(isset(self::$allfiles[$name])){
+            $sum=md5_file($path);
+            return self::$allfiles[$name]==$sum;
+        }
     }
 
     private static function read($path){
