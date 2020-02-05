@@ -2,8 +2,14 @@
 namespace Primal;
 
 class Cache{
+    private static $allfiles=[];
+    private static $md5list=CTPATH.DIRECTORY_SEPARATOR."cache.json";
     public static function make(){
+        self::$allfiles=json_decode(file_get_contents(self::$md5list),true);
+        
         self::crawl(TPATH);
+        file_put_contents(self::$md5list,
+        json_encode(self::$allfiles,JSON_PRETTY_PRINT));
     }
 
     private static function crawl($path){
@@ -20,8 +26,11 @@ class Cache{
             if(is_dir($item)){
                 self::crawl($item);
             }else{
-                self::save($item,$itemname);
-                echo $item."\n";
+                if(!self::check_checksum($item,$itemname)){
+                    echo "$item \n";
+                    self::save($item,$itemname);
+                    self::checksum($item,$itemname);
+                }
             }
         }
     }
@@ -32,11 +41,18 @@ class Cache{
         self::write($dst,$str);
     }
 
+    private static function checksum($path,$name){
+        $sum=md5_file($path);
+        self::$allfiles[$name]=$sum;
+    }
+
+    private static function check_checksum($path,$name){
+        $sum=md5_file($path);
+        return self::$allfiles[$name]==$sum;
+    }
+
     private static function read($path){
-        $f=fopen($path,"r");
-        $r=fread($f,filesize($path));
-        fclose($f);
-        return $r;
+        return file_get_contents($path);
     }
 
     private static function replace($str){
