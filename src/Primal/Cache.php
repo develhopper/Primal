@@ -16,6 +16,8 @@ class Cache{
         $path=TPATH.DIRECTORY_SEPARATOR.$name;
         self::$allfiles=json_decode(file_get_contents(self::$md5list),true);
         if(!self::check_checksum($path,$name)){
+            self::$compiler=new Compiler();
+            self::$compiler->compile($path);
             self::save($path,$name);
             self::updatemd5list();
         }

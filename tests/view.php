@@ -4,5 +4,6 @@ include_once __DIR__.'/config.php';
  use Primal\Primal;
 Primal::view("test",[
     "title"=>"Far Cry: Primal",
-    "name"=>"Takkar"
+    "name"=>"Takkar",
+    "list"=>["lolo","loli"]
 ]);

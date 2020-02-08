@@ -3,3 +3,7 @@
 @section('main'){
     <h1>Hello</h1>
 }
+
+{%foreach($list as $l):%}
+    {%var_dump($l);%}
+{%endforeach;%}
