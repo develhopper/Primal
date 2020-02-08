@@ -4,10 +4,10 @@ namespace Primal;
 class Cache{
     private static $allfiles=[];
     private static $md5list=CTPATH.DIRECTORY_SEPARATOR."cache.json";
-    
+    private static $compiler;
     public static function make(){
         self::$allfiles=json_decode(file_get_contents(self::$md5list),true);
-        
+        self::$compiler=new Compiler();
         self::crawl(TPATH);
         self::updatemd5list();
     }
@@ -23,34 +23,34 @@ class Cache{
     private static function updatemd5list(){
         file_put_contents(self::$md5list,
         json_encode(self::$allfiles,JSON_PRETTY_PRINT));
-    } 
-    private static function crawl($path){
-        $list=scandir($path);
+    }
+
+    private static function crawl($dir){
+        $list=scandir($dir);
         $list=array_diff($list,['.','..']);
 
-        $pattern="/(?<=".str_replace("/","\\/",TPATH).").*/";
-        preg_match($pattern,$path,$basename);
-        
+        // $pattern="/(?<=".str_replace("/","\\/",TPATH).").*/";
+        // preg_match($pattern,$dir,$basename);
+        $basename=explode(TPATH,$dir)[1];
+
         foreach($list as $item){
-            $itemname=ltrim("$basename[0]/$item",'/');
-            $item="$path/$item";
-            
-            if(is_dir($item)){
-                self::crawl($item);
+            $name=ltrim("$basename/$item",'/');
+            $path="$dir/$item";
+            if(is_dir($path)){
+                self::crawl($path);
             }else{
-                if(!self::check_checksum($item,$itemname)){
+                if(!self::check_checksum($path,$name)){
                     echo "$item \n";
-                    self::save($item,$itemname);
+                    self::$compiler->compile($path);
+                    self::save($path,$name);
                 }
             }
         }
     }
 
     private static function save($path,$name){
-        $dst=CTPATH.DIRECTORY_SEPARATOR.hash("sha1",$name).".php";
-        $str=self::replace(self::read($path));
-        var_dump($dst);
-        self::write($dst,$str);
+        $file=CTPATH.DIRECTORY_SEPARATOR.hash("sha1",$name).".php";
+        file_put_contents($file,self::$compiler->output);
         self::checksum($path,$name);
     }
 
@@ -64,25 +64,6 @@ class Cache{
             $sum=md5_file($path);
             return self::$allfiles[$name]==$sum;
         }
-    }
-
-    private static function read($path){
-        return file_get_contents($path);
-    }
-
-    private static function replace($str){
-        $str=preg_replace_callback("/(?<=\\{\\%).+(?=\\%\\})/",function($matches){
-                $matches[0]="$".trim($matches[0]);
-            return $matches[0];
-        },$str);
-        $str=str_replace("{%","<?= ",$str);
-        $str=str_replace("{{","<?php ",$str);
-        $str=str_replace(["%}","}}"]," ?>",$str);
-        return $str;
-    }
-
-    private static function write($dst,$str){
-        file_put_contents($dst,$str);
     }
 
     private static function clean(){
