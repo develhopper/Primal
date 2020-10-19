@@ -23,7 +23,7 @@ class FileSystem{
         }
     }
 
-    public function md5check($path,$md5){
+    public static function md5check($path,$md5){
         if(!file_exists($path)||is_null($md5))
             return false;
         return md5_file($path)==$md5;
