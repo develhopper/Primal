@@ -24,7 +24,6 @@ class Compiler{
             else if(strpos($line,"@")!==FALSE){
                 $node=$this->getNode($line);
                 if($node){
-                    $this->push($node);
                     $output=$node->compile();
                     if(is_object($output)){
                         array_push($this->append,$output);
@@ -65,6 +64,7 @@ class Compiler{
                 $class->tagName=$name;
                 $class->views_dir=$this->views_dir;
                 $class->cache_dir=$this->cache_dir;
+                $this->push($class);
                 return $class;
             }
         }

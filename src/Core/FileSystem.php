@@ -12,7 +12,9 @@ class FileSystem{
     public static function write($path,$content){
         if(self::isWritable($path)){
             file_put_contents($path,$content);
-        }
+		}else{
+			die("this path is not writeable $path ");
+		}
     }
 
     public static function isWritable($path){
