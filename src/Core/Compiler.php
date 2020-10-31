@@ -5,8 +5,8 @@ class Compiler{
     public $src_string;
     public $out_string;
     public $views_dir,$cache_dir;
-    public array $stack=[];
-    public array $append=[];
+    public $stack=[];
+    public $append=[];
     public function __construct(){
 
     }
