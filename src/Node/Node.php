@@ -2,7 +2,7 @@
 namespace Primal\Node;
 
 class Node{
-    private array $args;
+    private $args=[];
     public $tagName=null;
     public $childs_count=0;
     public $views_die,$cache_dir;
