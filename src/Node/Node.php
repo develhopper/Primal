@@ -33,7 +33,7 @@ class Node{
     }
 
     public static function strHash(string $str){
-        return $str."_".substr(base64_encode($str),0,4);
+        return $str."_".substr(md5($str),0,4);
     }
     
 }
