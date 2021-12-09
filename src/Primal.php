@@ -41,6 +41,9 @@ class Primal{
     public function view($name,array $args=[]){
         $path=$this->load($name);
         extract($args);
+		ob_start();
         include $path;
+		$content = ob_get_clean();
+		return $content;
     } 
 }
