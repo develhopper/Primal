@@ -29,7 +29,9 @@ class Compiler{
                         array_push($this->append,$output);
                     }else
                         $this->write($output."\n");
-                }
+				}else{
+					$this->write($line."\n");
+				}
             }else{
                 $this->write($line."\n");
             }
