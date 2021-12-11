@@ -7,25 +7,27 @@ use Primal\Core\Cache;
 
 class Primal{
 
-    private $views_dir;
-    private $cache_dir;
     private $compiler;
     private $cache;
     private static $pml=null;
+    private $options;
     
-    private function __construct(){}
+    private function __construct($options){
+        $this->compiler = Compiler::getInstance($options);
+        $this->options = $options;
+    }
 
     public function __set($key,$value){
         $this->$key=$value;
     }
 
     public function initCache(){
-        $this->cache=new Cache($this->views_dir,$this->cache_dir);
+        $this->cache=Cache::getInstance($this->options);
     }
 
     public static function getInstance(array $options=[]){
         if(self::$pml==null){
-            self::$pml=new Primal();
+            self::$pml=new Primal($options);
         }
         foreach($options as $key=>$value){
             self::$pml->$key=$value;
@@ -35,7 +37,7 @@ class Primal{
     }
 
     public function load($view){
-        return $this->cache->checkview($view);
+        return $this->cache->get_view($view);
     }
 
     public function view($name,array $args=[]){

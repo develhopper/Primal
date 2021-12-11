@@ -4,11 +4,28 @@ use Primal\Node\Node;
 class Compiler{
     public $src_string;
     public $out_string;
-    public $views_dir,$cache_dir;
+    public $options;
     public $stack=[];
     public $append=[];
-    public function __construct(){
+    private static $INSTANCE;
 
+    private function __construct($options){
+        $this->options = $options;
+    }
+
+    public static function getInstance($options = null){
+        if(!self::$INSTANCE){
+            self::$INSTANCE = new Compiler($options);
+        }
+        return self::$INSTANCE;
+    }
+
+    public static function newInstance($options = []){
+        if(self::$INSTANCE){
+            return new Compiler(self::$INSTANCE->options);
+        }else{
+            return new Compiler($options);
+        }
     }
 
     public function compile($src_string){
@@ -64,8 +81,7 @@ class Compiler{
                 $class=new $action['class']($this);
                 $class->args=array_slice($matches,1);
                 $class->tagName=$name;
-                $class->views_dir=$this->views_dir;
-                $class->cache_dir=$this->cache_dir;
+                $class->options=$this->options;
                 $this->push($class);
                 return $class;
             }

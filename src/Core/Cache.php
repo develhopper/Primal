@@ -1,34 +1,40 @@
 <?php
 namespace Primal\Core;
 
+use Primal\Primal;
+
 class Cache{
     private $allfiles;
     private $md5list;
     private $compiler;
-    private $cache_dir,$views_dir;
+    private $options;
+    private static $INSTANCE;
 
-    public function __construct($views_dir,$cache_dir){
-        $this->views_dir=$views_dir;
-        $this->cache_dir=$cache_dir;
-        $this->md5list=$this->cache_dir."/cache.json";
+    public function __construct($options){
+        $this->options = $options;
+        $this->md5list=$this->options['cache_dir']."/cache.json";
+    }
+
+    public static function getInstance($options=[]){
+        if(!self::$INSTANCE){
+            self::$INSTANCE = new Cache($options);
+        }
+        return self::$INSTANCE;
     }
 
     public function make(){
+        Primal::getInstance($this->options);
         $this->allfiles=$this->cacheList();
-        $this->compiler=new Compiler();
-        $this->compiler->views_dir=$this->views_dir;
-        $this->compiler->cache_dir=$this->cache_dir;
-        $this->crawl($this->views_dir);
+        $this->compiler=Compiler::getInstance($this->options);
+        $this->crawl($this->options['views_dir']);
         $this->updatemd5list();
     }
 
-    public function checkview($name){
-        $path=$this->views_dir.DIRECTORY_SEPARATOR.$name;
+    public function get_view($name){
+        $path=$this->options['views_dir'].'/'.$name;
         $this->allfiles=$this->cacheList();
         if(!FileSystem::md5check($path,$this->getCheckSum($name))){
-            $this->compiler=new Compiler();
-            $this->compiler->views_dir=$this->views_dir;
-            $this->compiler->cache_dir=$this->cache_dir;
+            $this->compiler=Compiler::newInstance();
             $this->compiler->compile(FileSystem::read($path));
             $this->save($path,$name);
             $this->updatemd5list();
@@ -40,10 +46,11 @@ class Cache{
         json_encode($this->allfiles,JSON_PRETTY_PRINT));
     }
 
+    // not working properly
     private function crawl($dir){
         $list=scandir($dir);
         $list=array_diff($list,['.','..']);
-        $basename=explode($this->views_dir,$dir)[1];
+        $basename=explode($this->options['views_dir'],$dir)[1];
         foreach($list as $item){
             $path="$dir/$item";
             $name="$basename/$item";
@@ -58,7 +65,7 @@ class Cache{
     }
 
     private function save($path,$name){
-        $file=$this->cache_dir.DIRECTORY_SEPARATOR.hash("sha1",$name).".php";
+        $file=$this->options['cache_dir'].'/'.hash("sha1",$name).".php";
         FileSystem::write($file,$this->compiler->out_string);
         $this->setCheckSum($path,$name);
     }
@@ -85,6 +92,6 @@ class Cache{
     }
 
     public function getPath($name){
-        return $this->cache_dir.DIRECTORY_SEPARATOR.hash("sha1",$name).".php";
+        return $this->options['cache_dir'].'/'.hash("sha1",$name).".php";
     }
 }

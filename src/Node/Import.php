@@ -3,12 +3,18 @@ namespace Primal\Node;
 use Primal\Compiler;
 use Primal\Primal;
 class Import extends Node{
-    public $views_die,$cache_dir;
+    public $options;
     public function compile(){
         if(!empty($this->args)){
-            $pml=Primal::getInstance(["views_dir"=>$this->views_dir,"cache_dir"=>$this->cache_dir]);
+            $pml=Primal::getInstance();
             $filename=$pml->load($this->args[0]);
-            return "<?php include_once '$filename'; ?>";
+            return "<?php \r\n".
+            "use Primal\Primal;\r\n".
+            "\$primal_options = ['views_dir'=>'{$this->options['views_dir']}','cache_dir' => '{$this->options['cache_dir']}'];\r\n".
+            "\$pml = Primal::getInstance();\r\n".
+            "\$view_path = \$pml->load('{$this->args[0]}');\r\n".
+            "include_once \$view_path;\r\n". 
+            "?>";
         }else{
             die("syntax error");
         }
