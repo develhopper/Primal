@@ -5,6 +5,7 @@ use Primal\Primal;
 class extendNode extends Node{
     public $options;
     public $output;
+    public $multiline=false;
     public function compile(){
         if(!empty($this->args)){
             $this->output="<?php \r\n".

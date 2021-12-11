@@ -1,8 +1,18 @@
 <?php
 include __DIR__.'/../vendor/autoload.php';
-include_once __DIR__.'/config.php';
- use Primal\Primal;
- $primal=Primal::getInstance(["views_dir"=>__DIR__."/views","cache_dir"=>__DIR__."/cache"]);
+include __DIR__.'/nodes/TestNode.php';
+
+use Primal\Primal;
+
+$options = [
+    "views_dir"=>__DIR__."/views",
+    "cache_dir"=>__DIR__."/cache",
+    "nodes" => [
+        "test"=>["regex"=>"/\@test/", "class"=>Nodes\TestNode::class]
+    ]
+];
+
+$primal=Primal::getInstance($options);
 echo $primal->view("test.html",[
     "title"=>"Primal",
     "name"=>"dear user",

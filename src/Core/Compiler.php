@@ -53,36 +53,37 @@ class Compiler{
                 $this->write($line."\n");
             }
         }
-        $this->doAppends();
-        $this->replaceTags();
+        $this->append_nodes();
+        $this->replace_tags();
     }
 
-    private function doAppends(){
+    private function append_nodes(){
         foreach($this->append as $node){
             $this->write($node->output);
         }
     }
 
-    private function replaceTags(){
+    private function replace_tags(){
         $this->out_string=str_replace("{{","<?= ",$this->out_string);
         $this->out_string=str_replace("{%","<?php ",$this->out_string);
         $this->out_string=str_replace(["%}","}}"]," ?>",$this->out_string);
     }
 
     public function getNode($line){
-        foreach(Node::$actions as $name=>$action){
-            preg_match($action['regex'],$line,$matches);
+        foreach($this->options['nodes'] as $name=>$node){
+            preg_match($node['regex'],$line,$matches);
             if($matches){
                 if(strpos($name,"end")===0){
                     $class=$this->pop();
                     $class->tagName=$name;
                     return $class;
                 }
-                $class=new $action['class']($this);
+                $class=new $node['class']($this);
                 $class->args=array_slice($matches,1);
                 $class->tagName=$name;
                 $class->options=$this->options;
-                $this->push($class);
+                if($class->multiline)
+                    $this->push($class);
                 return $class;
             }
         }

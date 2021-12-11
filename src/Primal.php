@@ -13,8 +13,13 @@ class Primal{
     private $options;
     
     private function __construct($options){
-        $this->compiler = Compiler::getInstance($options);
         $this->options = $options;
+        $nodes = include __DIR__."/config/nodes.php";
+        if(isset($options['nodes'])){
+            $nodes = array_merge($nodes,$options['nodes']);
+        }
+        $this->options['nodes'] = $nodes;
+        $this->compiler = Compiler::getInstance($this->options);
     }
 
     public function __set($key,$value){

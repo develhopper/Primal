@@ -4,10 +4,9 @@ use Primal\Compiler;
 use Primal\Primal;
 class Import extends Node{
     public $options;
+    public $multiline = false;
     public function compile(){
         if(!empty($this->args)){
-            $pml=Primal::getInstance();
-            $filename=$pml->load($this->args[0]);
             return "<?php \r\n".
             "use Primal\Primal;\r\n".
             "\$primal_options = ['views_dir'=>'{$this->options['views_dir']}','cache_dir' => '{$this->options['cache_dir']}'];\r\n".
