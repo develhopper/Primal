@@ -82,7 +82,7 @@ class Compiler{
                 $class->args=array_slice($matches,1);
                 $class->tagName=$name;
                 $class->options=$this->options;
-                if($class->multiline)
+                if(isset($node['stack']) && $node['stack'] == true)
                     $this->push($class);
                 return $class;
             }

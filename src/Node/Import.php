@@ -4,7 +4,6 @@ use Primal\Compiler;
 use Primal\Primal;
 class Import extends Node{
     public $options;
-    public $multiline = false;
     public function compile(){
         if(!empty($this->args)){
             return "<?php \r\n".
